@@ -1,5 +1,3 @@
-# Password_Filtradas
-
 # Proyecto Universitario Validación de Contraseñas Filtradas
 Materia: Algoritmos
 
