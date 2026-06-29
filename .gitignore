@@ -430,3 +430,6 @@ FodyWeavers.xsd
 
 contrasenas_filtradas.txt
 palabras_comunes.txt
+
+vcpkg_installed/
+vcpkg-configuration.json
