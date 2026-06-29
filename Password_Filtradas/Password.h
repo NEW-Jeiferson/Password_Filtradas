@@ -1,4 +1,4 @@
-/* Declaraciones, constantes y prototipos */
+/* Declaraciones, constantes y prototipos de funciones del proyecto */
 
 #ifndef PASSWORD_H
 #define PASSWORD_H
@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+
 
 
 #define MAX_PASSWORD_LEN    256
@@ -18,7 +19,7 @@
 
 
 /* insertion_sort.c */
-void insertion_sort(char** lista, int total);
+int insertion_sort(char** lista, int total);
 
 /* busqueda_binaria.c */
 int busqueda_binaria(char** lista, int total, const char* objetivo);
