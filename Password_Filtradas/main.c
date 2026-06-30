@@ -309,7 +309,7 @@ static enum MHD_Result manejar_peticion(
                 MHD_add_response_header(respuesta,
                     "Content-Type", "application/json");
                 ret = MHD_queue_response(conexion,
-                    MHD_HTTP_PAYLOAD_TOO_LARGE, respuesta);
+                    MHD_HTTP_CONTENT_TOO_LARGE, respuesta);
                 MHD_destroy_response(respuesta);
                 *tam_datos = 0;
                 return ret;
@@ -360,7 +360,7 @@ static enum MHD_Result manejar_peticion(
                 MHD_add_response_header(respuesta,
                     "Content-Type", "application/json");
                 ret = MHD_queue_response(conexion,
-                    MHD_HTTP_PAYLOAD_TOO_LARGE, respuesta);
+                    MHD_HTTP_CONTENT_TOO_LARGE, respuesta);
                 MHD_destroy_response(respuesta);
                 *tam_datos = 0;
                 return ret;
@@ -495,7 +495,7 @@ static enum MHD_Result manejar_peticion(
                 MHD_add_response_header(respuesta,
                     "Content-Type", "application/json");
                 ret = MHD_queue_response(conexion,
-                    MHD_HTTP_PAYLOAD_TOO_LARGE, respuesta);
+                    MHD_HTTP_CONTENT_TOO_LARGE, respuesta);
                 MHD_destroy_response(respuesta);
                 *tam_datos = 0;
                 return ret;

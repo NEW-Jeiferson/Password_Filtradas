@@ -1,4 +1,4 @@
-/* Declaraciones, constantes y prototipos de funciones del proyecto */
+/* Declaraciones, constantes y prototipos */
 
 #ifndef PASSWORD_H
 #define PASSWORD_H
@@ -7,8 +7,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-
-
 
 #define MAX_PASSWORD_LEN    256
 #define MAX_PASSWORDS       150000
