@@ -84,9 +84,6 @@ int cargar_archivo(const char* ruta, char** lista, int max) {
         strcpy(lista[total], buffer);
         total++;
 
-        /* Insertion Sort en cada inserción, tal como define
-           la propuesta: el mejor caso de Insertion Sort es
-           cuando los datos llegan de forma incremental */
         insertion_sort(lista, total);
     }
 
@@ -312,7 +309,7 @@ static enum MHD_Result manejar_peticion(
                 MHD_add_response_header(respuesta,
                     "Content-Type", "application/json");
                 ret = MHD_queue_response(conexion,
-                    MHD_HTTP_CONTENT_TOO_LARGE, respuesta);
+                    MHD_HTTP_PAYLOAD_TOO_LARGE, respuesta);
                 MHD_destroy_response(respuesta);
                 *tam_datos = 0;
                 return ret;
@@ -349,6 +346,11 @@ static enum MHD_Result manejar_peticion(
 
         if (*tam_datos > 0) {
 
+            /* Gestor de emergencia: mismo límite que en /verificar,
+               aquí es aún más importante porque este endpoint es
+               justo el que procesa archivos grandes (el caso que
+               mencionaron como riesgo de "explotar" con muchos
+               datos). Se corta aquí antes de reservar memoria. */
             if (!revisar_tamano_peticion(*tam_datos)) {
                 const char* err =
                     "{\"error\":\"Archivo demasiado grande\"}";
@@ -358,7 +360,7 @@ static enum MHD_Result manejar_peticion(
                 MHD_add_response_header(respuesta,
                     "Content-Type", "application/json");
                 ret = MHD_queue_response(conexion,
-                    MHD_HTTP_CONTENT_TOO_LARGE, respuesta);
+                    MHD_HTTP_PAYLOAD_TOO_LARGE, respuesta);
                 MHD_destroy_response(respuesta);
                 *tam_datos = 0;
                 return ret;
@@ -493,7 +495,7 @@ static enum MHD_Result manejar_peticion(
                 MHD_add_response_header(respuesta,
                     "Content-Type", "application/json");
                 ret = MHD_queue_response(conexion,
-                    MHD_HTTP_CONTENT_TOO_LARGE, respuesta);
+                    MHD_HTTP_PAYLOAD_TOO_LARGE, respuesta);
                 MHD_destroy_response(respuesta);
                 *tam_datos = 0;
                 return ret;
