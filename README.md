@@ -1,6 +1,5 @@
 # Proyecto Universitario Validación de Contraseñas Filtradas
 
-
 ## Requisitos
 - Visual Studio 2026
 - Workload: Desarrollo para escritorio con C++
