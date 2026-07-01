@@ -19,7 +19,6 @@ int insertion_sort(char** lista, int total) {
         return -1;
     }
 
-    /* Con un solo elemento no hay nada que desplazar */
     if (total == 1) {
         return 0;
     }
