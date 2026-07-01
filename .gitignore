@@ -431,5 +431,20 @@ FodyWeavers.xsd
 contrasenas_filtradas.txt
 palabras_comunes.txt
 
+## contrasenas_filtradas_10k.txt SI queda versionado, a proposito:
+## es un dataset de prueba chico para que cualquiera que clone el
+## repo tenga algo con que probar sin depender del dataset real
+## de 100k (que pesa ~1MB y no esta en git).
+
 vcpkg_installed/
 vcpkg-configuration.json
+
+## Archivos propios del proyecto — generados al probar el servidor
+## manualmente (curl / Postman / la interfaz), no forman parte del
+## código fuente. dataset_nuevo.txt lo genera el propio servidor en
+## POST /cargar-dataset; los demas son ejemplos de prueba que se van
+## creando y renombrando durante las pruebas manuales.
+dataset_nuevo.txt
+resultado*.json
+test_archivo*.txt
+*.txt.bak

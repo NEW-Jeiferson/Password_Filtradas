@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SDK Validación de Contraseñas Filtradas</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="fondo-ambiente" aria-hidden="true"></div>
+
+<div class="marco">
+
+  <header class="cabecera">
+    <div class="cabecera-titulo">
+      <h1>Validación de Contraseñas Filtradas</h1>
+      <p class="cabecera-subtitulo">
+        Analiza la seguridad de tus contraseñas utilizando algoritmos de búsqueda y detección de filtraciones.
+      </p>
+    </div>
+  </header>
+
+  <div class="cuerpo">
+
+    <nav class="nav-lateral anim-entrada anim-retraso-1" aria-label="Secciones">
+      <button class="nav-item es-activo" data-vista="verificar" type="button">
+        <span class="nav-etiqueta">Verificar</span>
+      </button>
+      <button class="nav-item" data-vista="archivo" type="button">
+        <span class="nav-etiqueta">Archivo</span>
+      </button>
+      <button class="nav-item" data-vista="dataset" type="button">
+        <span class="nav-etiqueta">Dataset</span>
+      </button>
+      <button class="nav-item" data-vista="estado" type="button">
+        <span class="nav-etiqueta">Estado</span>
+      </button>
+    </nav>
+
+    <main class="panel anim-entrada anim-retraso-2">
+
+      <!-- ===== VISTA: VERIFICAR UNA CONTRASEÑA ===== -->
+      <section class="vista es-activa" data-vista="verificar">
+        <h2 class="panel-titulo">Verificar contraseña</h2>
+
+        <form id="form-verificar" class="formulario" autocomplete="off">
+          <div class="campo-con-boton">
+            <input
+              type="text"
+              id="input-password"
+              name="password"
+              placeholder="Escribe una contraseña…"
+              maxlength="255"
+              required>
+            <button type="button" class="boton-ojo" id="boton-mostrar" aria-label="Mostrar u ocultar contraseña">ver</button>
+          </div>
+          <button type="submit" class="boton boton-primario">
+            Escanear
+          </button>
+        </form>
+
+        <div class="linea-escaneo" id="linea-escaneo" hidden></div>
+
+        <div class="resultado" id="resultado-verificar" hidden>
+          <div class="resultado-cabecera">
+            <span class="etiqueta-nivel" id="etiqueta-nivel">—</span>
+            <span class="resultado-titulo" id="resultado-titulo">—</span>
+          </div>
+
+          <div class="medidor" aria-hidden="true">
+            <div class="medidor-bloques" id="medidor-bloques"></div>
+            <span class="medidor-texto" id="medidor-texto">0/6</span>
+          </div>
+
+          <ul class="lista-hallazgos" id="lista-hallazgos"></ul>
+        </div>
+
+        <p class="mensaje-error" id="error-verificar" hidden></p>
+      </section>
+
+      <!-- ===== VISTA: VERIFICAR ARCHIVO ===== -->
+      <section class="vista" data-vista="archivo">
+        <h2 class="panel-titulo">Verificar archivo</h2>
+
+        <form id="form-archivo" class="formulario">
+          <label class="campo-archivo" id="zona-arrastre" for="input-archivo">
+            <span class="campo-archivo-icono">↑</span>
+            <span class="campo-archivo-texto" id="texto-archivo">
+              Arrastra un .txt o haz clic
+            </span>
+            <input type="file" id="input-archivo" name="archivo" accept=".txt" hidden>
+          </label>
+          <button type="submit" class="boton boton-primario" id="boton-subir-archivo" disabled>
+            Verificar archivo
+          </button>
+        </form>
+
+        <p class="subtexto">Una contraseña por línea. Límite 10&nbsp;MB.</p>
+
+        <div class="barra-progreso" id="barra-progreso-archivo" hidden>
+          <div class="barra-progreso-relleno"></div>
+        </div>
+
+        <div class="skeleton-tabla" id="skeleton-tabla" hidden>
+          <div class="skeleton-fila"></div>
+          <div class="skeleton-fila"></div>
+          <div class="skeleton-fila"></div>
+          <div class="skeleton-fila"></div>
+        </div>
+
+        <div class="resumen-archivo" id="resumen-archivo" hidden></div>
+
+        <div class="tabla-resultados-contenedor" id="tabla-resultados-contenedor" hidden>
+          <table class="tabla-resultados">
+            <thead>
+              <tr>
+                <th>Contraseña</th>
+                <th>Nivel</th>
+                <th>Filtrada</th>
+                <th>Palabra común</th>
+              </tr>
+            </thead>
+            <tbody id="cuerpo-tabla-resultados"></tbody>
+          </table>
+        </div>
+
+        <p class="mensaje-error" id="error-archivo" hidden></p>
+      </section>
+
+      <!-- ===== VISTA: CARGAR DATASET ===== -->
+      <section class="vista" data-vista="dataset">
+        <h2 class="panel-titulo">Reemplazar dataset</h2>
+
+        <div class="aviso">
+          Reemplaza por completo el dataset de filtradas en memoria. No se puede deshacer.
+        </div>
+
+        <form id="form-dataset" class="formulario">
+          <label class="campo-archivo" id="zona-arrastre-dataset" for="input-dataset">
+            <span class="campo-archivo-icono">↑</span>
+            <span class="campo-archivo-texto" id="texto-dataset">
+              Arrastra el nuevo dataset .txt o haz clic
+            </span>
+            <input type="file" id="input-dataset" name="dataset" accept=".txt" hidden>
+          </label>
+          <button type="submit" class="boton boton-peligro" id="boton-cargar-dataset" disabled>
+            Reemplazar dataset
+          </button>
+        </form>
+
+        <p class="mensaje-exito" id="exito-dataset" hidden></p>
+        <p class="mensaje-error" id="error-dataset" hidden></p>
+      </section>
+
+      <!-- ===== VISTA: ESTADO ===== -->
+      <section class="vista" data-vista="estado">
+        <h2 class="panel-titulo">Estado del servidor</h2>
+
+        <div class="tarjetas-estado">
+          <div class="tarjeta-estado anim-tarjeta">
+            <span class="tarjeta-estado-numero" id="numero-filtradas">—</span>
+            <span class="tarjeta-estado-etiqueta">contraseñas filtradas</span>
+          </div>
+          <div class="tarjeta-estado anim-tarjeta anim-retraso-1">
+            <span class="tarjeta-estado-numero" id="numero-palabras">—</span>
+            <span class="tarjeta-estado-etiqueta">palabras comunes</span>
+          </div>
+        </div>
+
+        <button class="boton boton-secundario" id="boton-refrescar-estado" type="button">
+          Actualizar
+        </button>
+
+        <p class="mensaje-error" id="error-estado" hidden></p>
+      </section>
+
+    </main>
+  </div>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

@@ -38,6 +38,10 @@ int busqueda_lineal(char** palabras, int total, const char* contrasena) {
         }
         palabra_lower[j] = '\0';
 
+        if (palabra_lower[0] == '\0') {
+            continue;
+        }
+
         if (strstr(contrasena_lower, palabra_lower) != NULL) {
             return i;
         }
