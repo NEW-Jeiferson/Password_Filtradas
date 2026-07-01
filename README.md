@@ -5,7 +5,7 @@ seguridad conocidas y analiza su fortaleza, con una interfaz web
 servida por un servidor HTTP local (libmicrohttpd). Corre 100% en
 tu máquina, no depende de ningún servicio externo.
 
-📄 Documentación completa: [`Documentacion_Tecnica.md`](Documentacion_Tecnica.md)
+📄 Documentación completa: Documentación
 (arquitectura, algoritmos, complejidad) · [`TROUBLESHOOTING.md`](TROUBLESHOOTING.md)
 (problemas comunes al compilar o ejecutar)
 
