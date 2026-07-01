@@ -1,76 +1,58 @@
 # Proyecto Universitario Validación de Contraseñas Filtradas
 
-## Requisitos
-- Visual Studio 2026
-- Workload: Desarrollo para escritorio con C++
+SDK en C que verifica si una contraseña fue filtrada en brechas de
+seguridad conocidas y analiza su fortaleza, con una interfaz web
+servida por un servidor HTTP local (libmicrohttpd). Corre 100% en
+tu máquina, no depende de ningún servicio externo.
 
-## Configuración del dataset
-1. Descargar contrasenas_filtradas.txt desde:
-   https://github.com/danielmiessler/SecLists/blob/master/Passwords/Common-Credentials/100k-most-used-passwords-NCSC.txt
-2. Descargar palabras_comunes.txt desde:
-   https://github.com/danielmiessler/SecLists/blob/master/Passwords/Language-Specific/Spanish_Pwdb_common-password-list-top-150.txt
-3. Colocar ambos archivos en:
-   Password_Filtradas/Password_Filtradas/
+📄 Documentación completa: [`Documentacion_Tecnica.md`](Documentación/Documentacion_Tecnica.md)
+(arquitectura, algoritmos, complejidad) · [`TROUBLESHOOTING.md`](Documentación/TROUBLESHOOTING.md)
+(problemas comunes al compilar o ejecutar)
 
-## Compilación
-Abrir Password_Filtradas.slnx con Visual Studio 2026 y compilar con Ctrl+B
+## Uso rápido (sin compilar nada)
 
-## Si Windows bloquea la ejecución del programa (Smart App Control)
+1. Ve a la sección [Releases](../../releases) y descarga el `.zip`
+   más reciente (`PasswordFiltradas-vX.X-win64.zip`).
+2. Descomprime en cualquier carpeta y ejecuta `Password_Filtradas.exe`.
+   > Si Windows muestra un aviso de SmartScreen ("Windows protegió
+   > su PC"): clic en "Más información" → "Ejecutar de todas
+   > formas". Es normal en software independiente sin firma de
+   > editor verificado.
+3. Abre `http://127.0.0.1:8080` en tu navegador.
 
-Algunas PC tienen activado "Smart App Control" en Windows, una función
-de seguridad que bloquea ejecutables nuevos sin firma digital. Si al
-correr el programa (Ctrl+F5) aparece el error:
+No necesitas internet para que funcione — el servidor es 100%
+local. Presiona Enter en la consola para detenerlo.
 
-"Una directiva de Control de aplicaciones bloqueó este archivo"
+## Desarrollo
 
-Sigue estos pasos una sola vez en tu máquina:
+### Requisitos
 
-### 1. Verificar si Smart App Control está activo
-Configuración de Windows > Privacidad y seguridad > Seguridad de
-Windows > Control de aplicaciones y del explorador > Smart App Control.
-Si dice "Activado", continúa con los siguientes pasos.
+- Visual Studio 2026, workload "Desarrollo para escritorio con C++"
 
-### 2. Crear un certificado local de desarrollo
-Abrir "Developer PowerShell for VS" (no hace falta ser administrador
-para este paso) y ejecutar:
+### Configuración del dataset
 
-```powershell
-$cert = New-SelfSignedCertificate -Type CodeSigningCert -Subject "CN=PasswordFiltradasDev" -CertStoreLocation "Cert:\CurrentUser\My" -NotAfter (Get-Date).AddYears(3)
-$cert | Export-Certificate -FilePath "$env:USERPROFILE\PasswordFiltradasDev.cer"
-```
+Descargar y colocar en `Password_Filtradas/Password_Filtradas/`:
 
-### 3. Instalar el certificado como confiable
-Cerrar esa terminal y abrir "Developer PowerShell for VS" de nuevo,
-esta vez con clic derecho > "Ejecutar como administrador". Ejecutar:
+- [contrasenas_filtradas.txt](https://github.com/danielmiessler/SecLists/blob/master/Passwords/Common-Credentials/100k-most-used-passwords-NCSC.txt)
+- [palabras_comunes.txt](https://github.com/danielmiessler/SecLists/blob/master/Passwords/Language-Specific/Spanish_Pwdb_common-password-list-top-150.txt)
 
-```powershell
-Import-Certificate -FilePath "$env:USERPROFILE\PasswordFiltradasDev.cer" -CertStoreLocation Cert:\LocalMachine\Root
-Import-Certificate -FilePath "$env:USERPROFILE\PasswordFiltradasDev.cer" -CertStoreLocation Cert:\LocalMachine\TrustedPublisher
-```
+El repo ya incluye `contrasenas_filtradas_10k.txt` como muestra
+chica para pruebas rápidas, sin necesidad de descargar el dataset
+completo.
 
-Cada uno de estos dos comandos imprime un Thumbprint (una cadena
-larga de letras y números). Copia ese Thumbprint, se usa en el
-siguiente paso.
+### Compilar y correr
 
-### 4. Configurar el proyecto para firmar el .exe automáticamente
-En Visual Studio: clic derecho en el proyecto Password_Filtradas >
-Properties > Configuration Properties > Build Events > Post-Build Event.
-En el campo "Command Line" escribir, reemplazando TU_THUMBPRINT por
-el valor copiado en el paso anterior:
+Abrir `Password_Filtradas.slnx` en Visual Studio 2026,
+`Ctrl+Shift+B` para compilar, `Ctrl+F5` para correr. Con el servidor
+arriba, abrir `http://127.0.0.1:8080` en el navegador — ahí carga
+la interfaz completa (`web/index.html`, `web/style.css`,
+`web/app.js`, servidos directo desde disco).
 
-```
-signtool sign /sha1 TU_THUMBPRINT /fd SHA256 "$(TargetPath)"
-```
-
-Apply > OK, y recompilar con Ctrl+Shift+B. A partir de ahí, cada
-build firma el .exe automáticamente y Windows ya no debería bloquearlo.
-
-Nota: el certificado generado en el paso 2 es local a cada máquina,
-no se sube al repositorio. Cada persona del equipo que tenga Smart
-App Control activado debe generar el suyo siguiendo estos mismos
-pasos.
+¿Algo falla al compilar o ejecutar? Ver
+[`TROUBLESHOOTING.md`](Documentación/TROUBLESHOOTING.md).
 
 ## Estructura del proyecto
+
 ```
 Password_Filtradas/
 └── Password_Filtradas/
@@ -80,6 +62,27 @@ Password_Filtradas/
     ├── busqueda_binaria.c
     ├── busqueda_lineal.c
     ├── fortaleza.c
-    ├── contrasenas_filtradas.txt  (no está en git)
-    └── palabras_comunes.txt       (no está en git)
+    ├── contrasenas_filtradas.txt      (no está en git)
+    ├── contrasenas_filtradas_10k.txt  (sí está en git, dataset de prueba)
+    ├── palabras_comunes.txt           (no está en git)
+    └── web/
+        ├── index.html
+        ├── style.css
+        └── app.js
 ```
+
+Detalle de algoritmos usados (Insertion Sort, Búsqueda Binaria,
+Búsqueda Lineal), complejidad, y el contrato completo de la API
+HTTP: ver [`Documentacion_Tecnica.md`](Documentación/Documentacion_Tecnica.md).
+
+## Licencia
+
+Este proyecto está bajo [PolyForm Noncommercial License 1.0.0](LICENSE)
+— cualquiera puede usarlo, estudiarlo, modificarlo y compartirlo
+libremente para fines **no comerciales** (personal, académico,
+portfolio). No está permitido venderlo ni usarlo como parte de un
+producto o servicio comercial sin autorización del autor.
+
+El dataset de contraseñas filtradas y palabras comunes usado para
+pruebas proviene de [SecLists](https://github.com/danielmiessler/SecLists)
+(licencia MIT), incluido bajo sus propios términos.
