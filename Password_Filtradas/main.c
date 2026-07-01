@@ -18,15 +18,11 @@ static int      g_total_filtradas = 0;
 static char** g_palabras = NULL;
 static int      g_total_palabras = 0;
 
-/* Puntero global al servidor, necesario para poder detenerlo desde
-   el manejador de la señal SIGINT (Ctrl+C). Sin esto, cerrar el
-   programa de golpe deja el servidor y la memoria sin liberar. */
 static struct MHD_Daemon* g_servidor = NULL;
 
-/* Bandera que indica si el programa debe seguir corriendo. Se pone
-   en 0 desde el manejador de SIGINT para salir del bucle principal
-   de forma ordenada en vez de terminar el proceso abruptamente. */
 static volatile sig_atomic_t g_seguir_corriendo = 1;
+
+static int g_marca_conexion;
 
 
 /* Funciones de carga y Memoria */
@@ -226,11 +222,38 @@ static void manejar_sigint(int senal) {
 }
 
 
+
+static BOOL WINAPI manejador_consola(DWORD tipo_evento) {
+    if (tipo_evento == CTRL_CLOSE_EVENT
+        || tipo_evento == CTRL_C_EVENT
+        || tipo_evento == CTRL_BREAK_EVENT
+        || tipo_evento == CTRL_LOGOFF_EVENT
+        || tipo_evento == CTRL_SHUTDOWN_EVENT) {
+
+        if (g_servidor != NULL) {
+            MHD_stop_daemon(g_servidor);
+            g_servidor = NULL;
+        }
+        liberar_memoria(g_filtradas, g_total_filtradas);
+        liberar_memoria(g_palabras, g_total_palabras);
+        free(g_filtradas);
+        free(g_palabras);
+        g_filtradas = NULL;
+        g_palabras = NULL;
+
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
+
 /* Manejador de Peticiones http */
 
 static int revisar_tamano_peticion(size_t tam_datos) {
     return tam_datos <= TAM_MAXIMO_PETICION;
 }
+
 
 static enum MHD_Result manejar_peticion(
     void* cls,
@@ -249,7 +272,6 @@ static enum MHD_Result manejar_peticion(
 
     (void)cls;
     (void)version;
-    (void)ptr;
 
     /* ---- GET / → sirve el HTML principal ---- */
     if (strcmp(metodo, "GET") == 0 && strcmp(url, "/") == 0) {
@@ -296,10 +318,17 @@ static enum MHD_Result manejar_peticion(
     if (strcmp(metodo, "POST") == 0 &&
         strcmp(url, "/verificar") == 0) {
 
+        /* Primera llamada de esta conexión: todavía no hay cuerpo.
+           Se marca *ptr para reconocer la próxima llamada como
+           "ya no es la primera", y se pide a MHD que siga
+           esperando el cuerpo de la petición. */
+        if (*ptr == NULL) {
+            *ptr = &g_marca_conexion;
+            return MHD_YES;
+        }
+
         if (*tam_datos > 0) {
 
-            /* Gestor de emergencia: si el cuerpo de la petición es
-               anormalmente grande, se rechaza antes de procesarlo. */
             if (!revisar_tamano_peticion(*tam_datos)) {
                 const char* err =
                     "{\"error\":\"Peticion demasiado grande\"}";
@@ -337,20 +366,37 @@ static enum MHD_Result manejar_peticion(
             MHD_destroy_response(respuesta);
             return ret;
         }
-        return MHD_YES;
+
+        /* Llamada final: *ptr ya no es NULL y *tam_datos volvió a
+           ser 0, indicando que ya se recibió todo el cuerpo. Si
+           la petición venía sin cuerpo (texto vacío), no hay nada
+           que verificar; se responde con un error claro en vez
+           de dejar la conexión sin respuesta. */
+        {
+            const char* err = "{\"error\":\"Cuerpo de la peticion vacio\"}";
+            respuesta = MHD_create_response_from_buffer(
+                strlen(err), (void*)err, MHD_RESPMEM_PERSISTENT);
+            if (respuesta == NULL) return MHD_NO;
+            MHD_add_response_header(respuesta,
+                "Content-Type", "application/json");
+            ret = MHD_queue_response(conexion, MHD_HTTP_BAD_REQUEST,
+                respuesta);
+            MHD_destroy_response(respuesta);
+            return ret;
+        }
     }
 
     /* ---- POST /verificar-archivo → verifica varias contraseñas ---- */
     if (strcmp(metodo, "POST") == 0 &&
         strcmp(url, "/verificar-archivo") == 0) {
 
+        if (*ptr == NULL) {
+            *ptr = &g_marca_conexion;
+            return MHD_YES;
+        }
+
         if (*tam_datos > 0) {
 
-            /* Gestor de emergencia: mismo límite que en /verificar,
-               aquí es aún más importante porque este endpoint es
-               justo el que procesa archivos grandes (el caso que
-               mencionaron como riesgo de "explotar" con muchos
-               datos). Se corta aquí antes de reservar memoria. */
             if (!revisar_tamano_peticion(*tam_datos)) {
                 const char* err =
                     "{\"error\":\"Archivo demasiado grande\"}";
@@ -415,23 +461,13 @@ static enum MHD_Result manejar_peticion(
                 verificar_una(linea, resultado_uno,
                     sizeof(resultado_uno));
 
-                /* Calcular cuánto espacio queda ANTES de escribir,
-                   y detener el procesamiento si ya no entra más,
-                   en vez de dejar que pos_res supere sizeof(resultados)
-                   (eso causaría un underflow en la resta de tamaños
-                   sin signo, y un desborde real en el buffer). */
                 {
                     size_t espacio_restante =
                         TAM_RESULTADOS_ARCHIVO - pos_res;
                     size_t necesario =
                         strlen(resultado_uno) + (primero ? 0 : 1) + 2;
-                    /* +1 por la coma si no es el primero,
-                       +2 de margen por el cierre "]" y el nulo */
 
                     if (necesario >= espacio_restante) {
-                        /* Ya no hay espacio: cerrar el JSON aquí
-                           mismo y detener el procesamiento, en vez
-                           de seguir escribiendo fuera de límites. */
                         break;
                     }
                 }
@@ -456,11 +492,6 @@ static enum MHD_Result manejar_peticion(
 
             respuesta = MHD_create_response_from_buffer(
                 pos_res, resultados, MHD_RESPMEM_MUST_FREE);
-            /* MHD_RESPMEM_MUST_FREE: libmicrohttpd se encarga de
-               hacer free() sobre 'resultados' cuando ya no lo
-               necesite. Evita que nosotros tengamos que liberarlo
-               aquí y nos arriesguemos a un use-after-free o a
-               olvidarlo (memory leak). */
             if (respuesta == NULL) {
                 free(resultados);
                 return MHD_NO;
@@ -473,18 +504,32 @@ static enum MHD_Result manejar_peticion(
             MHD_destroy_response(respuesta);
             return ret;
         }
-        return MHD_YES;
+
+        {
+            const char* err = "{\"error\":\"Archivo vacio\"}";
+            respuesta = MHD_create_response_from_buffer(
+                strlen(err), (void*)err, MHD_RESPMEM_PERSISTENT);
+            if (respuesta == NULL) return MHD_NO;
+            MHD_add_response_header(respuesta,
+                "Content-Type", "application/json");
+            ret = MHD_queue_response(conexion, MHD_HTTP_BAD_REQUEST,
+                respuesta);
+            MHD_destroy_response(respuesta);
+            return ret;
+        }
     }
 
     /* ---- POST /cargar-dataset → reemplaza el dataset filtradas ---- */
     if (strcmp(metodo, "POST") == 0 &&
         strcmp(url, "/cargar-dataset") == 0) {
 
+        if (*ptr == NULL) {
+            *ptr = &g_marca_conexion;
+            return MHD_YES;
+        }
+
         if (*tam_datos > 0) {
 
-            /* Gestor de emergencia: mismo límite aquí también,
-               porque este endpoint escribe el contenido recibido
-               directo a disco con fwrite antes de procesarlo. */
             if (!revisar_tamano_peticion(*tam_datos)) {
                 const char* err =
                     "{\"ok\":false,"
@@ -532,7 +577,6 @@ static enum MHD_Result manejar_peticion(
                 total_nueva = cargar_archivo("dataset_nuevo.txt",
                     nueva, MAX_PASSWORDS);
                 if (total_nueva > 0) {
-                    /* Liberar el dataset anterior y reemplazar */
                     liberar_memoria(g_filtradas, g_total_filtradas);
                     free(g_filtradas);
                     g_filtradas = nueva;
@@ -543,12 +587,6 @@ static enum MHD_Result manejar_peticion(
                         total_nueva);
                 }
                 else {
-                    /* total_nueva puede ser 0 (archivo vacio) o
-                       el numero de lineas cargadas antes de un
-                       fallo de memoria. En ambos casos hay que
-                       liberar lo que sí llegó a reservarse con
-                       malloc antes de descartar 'nueva', si no
-                       se queda esa memoria sin liberar. */
                     if (total_nueva > 0) {
                         liberar_memoria(nueva, total_nueva);
                     }
@@ -572,7 +610,19 @@ static enum MHD_Result manejar_peticion(
             MHD_destroy_response(respuesta);
             return ret;
         }
-        return MHD_YES;
+
+        {
+            const char* err = "{\"ok\":false,\"mensaje\":\"Sin contenido\"}";
+            respuesta = MHD_create_response_from_buffer(
+                strlen(err), (void*)err, MHD_RESPMEM_PERSISTENT);
+            if (respuesta == NULL) return MHD_NO;
+            MHD_add_response_header(respuesta,
+                "Content-Type", "application/json");
+            ret = MHD_queue_response(conexion, MHD_HTTP_BAD_REQUEST,
+                respuesta);
+            MHD_destroy_response(respuesta);
+            return ret;
+        }
     }
 
     /* ---- 404 para cualquier otra ruta ---- */
@@ -595,11 +645,9 @@ static enum MHD_Result manejar_peticion(
 int main(void) {
     SetConsoleOutputCP(CP_UTF8);
 
-    /* Gestor de emergencia: registra manejar_sigint para que al
-       presionar Ctrl+C el programa no se cierre de golpe, sino que
-       salga del bucle principal y libere memoria y el servidor
-       correctamente antes de terminar. */
     signal(SIGINT, manejar_sigint);
+
+    SetConsoleCtrlHandler(manejador_consola, TRUE);
 
     printf("=== SDK Validacion de Contrasenas ===\n");
 
@@ -654,11 +702,6 @@ int main(void) {
     printf("Servidor corriendo en http://localhost:%d\n", PUERTO);
     printf("Presiona Enter o Ctrl+C para detener...\n");
 
-    /* Bucle de espera: se mantiene corriendo hasta que el usuario
-       presione Enter (getchar) o Ctrl+C (que pone en 0 la bandera
-       g_seguir_corriendo desde manejar_sigint). Se revisa la
-       bandera en cada vuelta para no quedar atascado si la señal
-       llega mientras getchar() está esperando. */
     while (g_seguir_corriendo) {
         int tecla = getchar();
         if (tecla == '\n' || tecla == EOF) {
