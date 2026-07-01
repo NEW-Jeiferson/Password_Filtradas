@@ -6,7 +6,7 @@ servida por un servidor HTTP local (libmicrohttpd). Corre 100% en
 tu máquina, no depende de ningún servicio externo.
 
 📄 Documentación completa: [`Documentacion_Tecnica.md`](Documentación/Documentacion_Tecnica.md)
-(arquitectura, algoritmos, complejidad) · [`TROUBLESHOOTING.md`](TROUBLESHOOTING.md)
+(arquitectura, algoritmos, complejidad) · [`TROUBLESHOOTING.md`](Documentación/TROUBLESHOOTING.md)
 (problemas comunes al compilar o ejecutar)
 
 ## Uso rápido (sin compilar nada)
@@ -49,7 +49,7 @@ la interfaz completa (`web/index.html`, `web/style.css`,
 `web/app.js`, servidos directo desde disco).
 
 ¿Algo falla al compilar o ejecutar? Ver
-[`TROUBLESHOOTING.md`](TROUBLESHOOTING.md).
+[`TROUBLESHOOTING.md`](Documentación/TROUBLESHOOTING.md)
 
 ## Estructura del proyecto
 
