@@ -10,15 +10,15 @@ int busqueda_binaria(char** lista, int total, const char* objetivo) {
 
     if (lista == NULL) {
         fprintf(stderr, "Error: lista no puede ser NULL\n");
-        return -1;
+        return -2;
     }
     if (objetivo == NULL) {
         fprintf(stderr, "Error: objetivo no puede ser NULL\n");
-        return -1;
+        return -2;
     }
     if (total <= 0) {
         fprintf(stderr, "Error: total debe ser mayor a 0\n");
-        return -1;
+        return -2;
     }
 
     inicio = 0;
@@ -29,7 +29,7 @@ int busqueda_binaria(char** lista, int total, const char* objetivo) {
 
         if (lista[medio] == NULL) {
             fprintf(stderr, "Error: elemento NULL en posicion %d\n", medio);
-            return -1;
+            return -2;
         }
 
         comparacion = strcmp(lista[medio], objetivo);
