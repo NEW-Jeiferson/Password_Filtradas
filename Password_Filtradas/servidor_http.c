@@ -39,8 +39,6 @@ static enum MHD_Result responder_error(struct MHD_Connection* conexion,
 }
 
 
-/* Sirve un archivo estatico desde disco (usado para index.html,
-   style.css, app.js). */
 static enum MHD_Result servir_archivo_estatico(
     struct MHD_Connection* conexion,
     const char* ruta,
