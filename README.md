@@ -49,7 +49,7 @@ la interfaz completa (`web/index.html`, `web/style.css`,
 `web/app.js`, servidos directo desde disco).
 
 ¿Algo falla al compilar o ejecutar? Ver
-[`TROUBLESHOOTING.md`](Documentación/TROUBLESHOOTING.md)
+[`TROUBLESHOOTING.md`](Documentación/TROUBLESHOOTING.md).
 
 ## Estructura del proyecto
 
@@ -74,3 +74,15 @@ Password_Filtradas/
 Detalle de algoritmos usados (Insertion Sort, Búsqueda Binaria,
 Búsqueda Lineal), complejidad, y el contrato completo de la API
 HTTP: ver [`Documentacion_Tecnica.md`](Documentación/Documentacion_Tecnica.md).
+
+## Licencia
+
+Este proyecto está bajo [PolyForm Noncommercial License 1.0.0](LICENSE)
+— cualquiera puede usarlo, estudiarlo, modificarlo y compartirlo
+libremente para fines **no comerciales** (personal, académico,
+portfolio). No está permitido venderlo ni usarlo como parte de un
+producto o servicio comercial sin autorización del autor.
+
+El dataset de contraseñas filtradas y palabras comunes usado para
+pruebas proviene de [SecLists](https://github.com/danielmiessler/SecLists)
+(licencia MIT), incluido bajo sus propios términos.
