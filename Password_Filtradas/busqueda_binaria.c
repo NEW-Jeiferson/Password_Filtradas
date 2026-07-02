@@ -26,6 +26,7 @@ int busqueda_binaria(char** lista, int total, const char* objetivo) {
     inicio = 0;
     fin = total - 1;
 
+	/* Búsqueda binaria */
     while (inicio <= fin) {
         medio = inicio + (fin - inicio) / 2;
 

@@ -11,6 +11,7 @@
 #include "servidor_http.h"
 #include "estado_peticion.h"
 
+/* Puerto en el que el servidor escuchará las peticiones HTTP */
 #define PUERTO 8080
 
 char** g_filtradas = NULL;
