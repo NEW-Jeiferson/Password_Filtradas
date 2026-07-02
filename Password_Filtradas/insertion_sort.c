@@ -27,9 +27,11 @@ int insertion_sort(char** lista, int total) {
         return 0;
     }
 
+	/* Tomar el último elemento como clave y encontrar su posición correcta */
     clave = lista[total - 1];
     j = total - 2;
 
+	/* Mover los elementos mayores que clave una posición adelante */
     while (j >= 0 && lista[j] != NULL && strcmp(lista[j], clave) > 0) {
         lista[j + 1] = lista[j];
         j--;

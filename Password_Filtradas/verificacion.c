@@ -18,7 +18,7 @@ static void escapar_json(const char* origen, char* destino, size_t tam) {
 
     if (origen == NULL || destino == NULL || tam == 0) return;
 
-
+	/* Escapar caracteres especiales para JSON */
     while (origen[i] != '\0' && j < tam - 2) {
         switch (origen[i]) {
         case '"':

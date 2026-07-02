@@ -25,6 +25,7 @@ int cargar_archivo(const char* ruta, char** lista, int max) {
         return -1;
     }
 
+	/* Abrir el archivo en modo lectura */
     archivo = fopen(ruta, "r");
     if (archivo == NULL) {
         fprintf(stderr, "Error: no se pudo abrir: %s\n", ruta);
