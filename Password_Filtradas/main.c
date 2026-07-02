@@ -31,7 +31,7 @@ static void manejar_sigint(int senal) {
     g_seguir_corriendo = 0;
 }
 
-
+/* Manejador de eventos de consola (Ctrl+C, cierre de ventana, etc.) */
 static BOOL WINAPI manejador_consola(DWORD tipo_evento) {
     if (tipo_evento == CTRL_CLOSE_EVENT
         || tipo_evento == CTRL_C_EVENT

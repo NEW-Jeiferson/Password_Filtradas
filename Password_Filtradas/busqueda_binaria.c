@@ -2,6 +2,8 @@
 
 #include "Password.h"
 
+/* Función para realizar una búsqueda binaria en un arreglo de cadenas ordenadas para verificar si la contraseña exacta está presente en el dataset de contraseñas filtradas.
+   Devuelve el índice de la contraseña encontrada, -1 si no se encuentra, o -2 si ocurre un error (como punteros NULL o tamaño inválido). */
 int busqueda_binaria(char** lista, int total, const char* objetivo) {
     int inicio;
     int fin;

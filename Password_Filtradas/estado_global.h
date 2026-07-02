@@ -3,8 +3,10 @@
 
 #include <signal.h>
 
+/* Declaraciones de variables globales compartidas entre los módulos. */
 struct MHD_Daemon;
 
+/* Variables globales para las contraseñas filtradas y palabras comunes. */
 extern char** g_filtradas;
 extern int      g_total_filtradas;
 extern char** g_palabras;

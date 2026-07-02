@@ -8,7 +8,10 @@
 #include "Password.h"
 #include "estado_global.h"
 
-
+/* Función para escapar caracteres especiales en una cadena JSON.
+   Se reemplazan los caracteres especiales por sus secuencias de escape correspondientes.
+   La cadena resultante se almacena en 'destino', que debe tener suficiente espacio.
+   Se asegura de no exceder el tamaño máximo 'tam' del destino. */
 static void escapar_json(const char* origen, char* destino, size_t tam) {
     size_t i = 0;
     size_t j = 0;
@@ -47,6 +50,10 @@ static void escapar_json(const char* origen, char* destino, size_t tam) {
     destino[j] = '\0';
 }
 
+/* Función principal para verificar la seguridad de una contraseña.
+   Se realiza una búsqueda binaria en el dataset de contraseñas filtradas y una búsqueda lineal en el dataset de palabras comunes.
+   Se calcula un puntaje de fortaleza y se genera un JSON con los resultados.
+   Devuelve 0 si la verificación fue exitosa, -1 si hubo un error. */
 int verificar_una(const char* contrasena, char* salida, size_t tam) {
     int          resultado_binaria;
     int          resultado_lineal;

@@ -2,6 +2,8 @@
 
 #include "Password.h"
 
+/* Función para realizar una búsqueda lineal en un arreglo de cadenas para verificar si alguna palabra común está contenida dentro de la contraseña proporcionada.
+   Devuelve el índice de la primera palabra encontrada, -1 si no se encuentra ninguna coincidencia, o -2 si ocurre un error (como punteros NULL o tamaño inválido). */
 int busqueda_lineal(char** palabras, int total, const char* contrasena) {
     int i;
     char contrasena_lower[MAX_PASSWORD_LEN];

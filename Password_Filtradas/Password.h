@@ -32,11 +32,4 @@ int busqueda_lineal(char** palabras, int total, const char* contrasena);
 int calcular_fortaleza(const char* contrasena);
 void mostrar_fortaleza(int puntaje);
 
-/* Nota sobre organizacion de modulos: cargar_archivo/liberar_memoria
- * viven en carga_datos.h, verificar_una en verificacion.h, y el
- * callback del servidor HTTP en servidor_http.h. Este header
- * (Password.h) se mantiene enfocado en los algoritmos centrales de
- * la materia (insertion sort, busqueda binaria, busqueda lineal,
- * fortaleza) y las constantes que todos los modulos comparten. */
-
 #endif

@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <microhttpd.h>
 
+/* Prototipos de funciones del servidor HTTP. */
 enum MHD_Result manejar_peticion(
     void* cls,
     struct MHD_Connection* conexion,

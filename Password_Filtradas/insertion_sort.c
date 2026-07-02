@@ -2,6 +2,10 @@
 
 #include "Password.h"
 
+/* Función para ordenar un arreglo de cadenas usando el algoritmo Insertion Sort.
+   Se asume que el arreglo ya contiene elementos ordenados hasta la posición total - 2,
+   y se inserta el elemento en la posición total - 1 en su lugar correcto.
+   Devuelve 0 si la operación fue exitosa, o -1 si hubo un error. */
 int insertion_sort(char** lista, int total) {
     int   j;
     char* clave;
