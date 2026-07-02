@@ -5,8 +5,8 @@ seguridad conocidas y analiza su fortaleza, con una interfaz web
 servida por un servidor HTTP local (libmicrohttpd). Corre 100% en
 tu máquina, no depende de ningún servicio externo.
 
-📄 Documentación completa: [`Documentacion_Tecnica.md`](documentacion/Documentacion_Tecnica.md)
-(arquitectura, algoritmos, complejidad) · [`TROUBLESHOOTING.md`](documentacion/TROUBLESHOOTING.md)
+📄 Documentación completa: [`Documentacion_Tecnica.md`](Documentación/Documentacion_Tecnica.md)
+(arquitectura, algoritmos, complejidad) · [`TROUBLESHOOTING.md`](Documentación/TROUBLESHOOTING.md)
 (problemas comunes al compilar o ejecutar)
 
 ## Uso rápido (sin compilar nada)
@@ -49,7 +49,7 @@ la interfaz completa (`web/index.html`, `web/style.css`,
 `web/app.js`, servidos directo desde disco).
 
 ¿Algo falla al compilar o ejecutar? Ver
-[`TROUBLESHOOTING.md`](documentacion/TROUBLESHOOTING.md).
+[`TROUBLESHOOTING.md`](Documentación/TROUBLESHOOTING.md).
 
 ## Estructura del proyecto
 
@@ -73,7 +73,7 @@ Password_Filtradas/
 
 Detalle de algoritmos usados (Insertion Sort, Búsqueda Binaria,
 Búsqueda Lineal), complejidad, y el contrato completo de la API
-HTTP: ver [`Documentacion_Tecnica.md`](documentacion/Documentacion_Tecnica.md).
+HTTP: ver [`Documentacion_Tecnica.md`](Documentación/Documentacion_Tecnica.md).
 
 ## Licencia
 
