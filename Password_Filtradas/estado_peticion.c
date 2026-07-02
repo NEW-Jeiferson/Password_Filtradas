@@ -5,17 +5,23 @@
 
 #define TAM_INICIAL_ACUMULADOR  4096
 
+/* Función para crear una nueva estructura EstadoPeticion y reservar memoria para ella */
 EstadoPeticion* crear_estado_peticion(void) {
     EstadoPeticion* estado = (EstadoPeticion*)calloc(1, sizeof(EstadoPeticion));
     return estado;
 }
 
+/* Función para liberar la memoria de la estructura EstadoPeticion */
 void destruir_estado_peticion(EstadoPeticion* estado) {
     if (estado == NULL) return;
     free(estado->buffer);
     free(estado);
 }
 
+/* Función para acumular datos en el buffer de la estructura EstadoPeticion.
+ * Devuelve 1 si se acumularon los datos correctamente, 0 si se excede el límite,
+ * y -1 si hubo un error de memoria.
+ */
 int acumular_datos(EstadoPeticion* estado, const char* datos,
     size_t tam, size_t limite) {
 
@@ -41,12 +47,13 @@ int acumular_datos(EstadoPeticion* estado, const char* datos,
         estado->tam_reservado = nuevo_tam;
     }
 
+	/* Copiar los datos al buffer y actualizar el tamaño usado */
     memcpy(estado->buffer + estado->tam_usado, datos, tam);
     estado->tam_usado += tam;
     return 1;
 }
 
-
+/* Función de callback para liberar recursos cuando la solicitud se completa o se termina */
 void solicitud_completada(void* cls,
     struct MHD_Connection* conexion,
     void** con_cls,

@@ -15,7 +15,7 @@
 #define TAM_RESULTADOS_ARCHIVO  65536
 #define TAM_MAXIMO_PETICION  (10 * 1024 * 1024)
 
-
+/* ---- Funciones auxiliares ---- */
 static enum MHD_Result responder_error(struct MHD_Connection* conexion,
     EstadoPeticion* estado,
     unsigned int codigo_http,
@@ -38,7 +38,7 @@ static enum MHD_Result responder_error(struct MHD_Connection* conexion,
     return ret;
 }
 
-
+/* ---- Servir archivos estáticos (HTML, CSS, JS) ---- */
 static enum MHD_Result servir_archivo_estatico(
     struct MHD_Connection* conexion,
     const char* ruta,

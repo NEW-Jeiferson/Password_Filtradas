@@ -3,6 +3,9 @@
 #include "carga_datos.h"
 #include "Password.h"
 
+/* Carga un archivo de texto línea por línea, eliminando saltos de línea y retornos de carro, y almacenando cada línea en un arreglo de cadenas.
+   El arreglo se ordena usando Insertion Sort después de cada inserción.
+   Devuelve el número total de líneas cargadas o -1 en caso de error. */
 int cargar_archivo(const char* ruta, char** lista, int max) {
     FILE* archivo = NULL;
     char    buffer[MAX_PASSWORD_LEN];
@@ -37,6 +40,7 @@ int cargar_archivo(const char* ruta, char** lista, int max) {
             break;
         }
 
+		/* Quitar '\n' al final de la línea si existe */
         longitud = strlen(buffer);
         if (longitud > 0 && buffer[longitud - 1] == '\n') {
             buffer[longitud - 1] = '\0';
@@ -60,6 +64,7 @@ int cargar_archivo(const char* ruta, char** lista, int max) {
         strcpy(lista[total], buffer);
         total++;
 
+		/* Ordenar la lista después de cada inserción para mantenerla ordenada */
         if (insertion_sort(lista, total) != 0) {
 
 
@@ -82,11 +87,13 @@ int cargar_archivo(const char* ruta, char** lista, int max) {
         }
     }
 
+	/* Cerrar el archivo y reportar el total de entradas cargadas */
     fclose(archivo);
     printf("Cargadas %d entradas desde %s\n", total, ruta);
     return total;
 }
 
+/* Libera la memoria de un arreglo de cadenas y establece los punteros a NULL */
 void liberar_memoria(char** lista, int total) {
     int i;
     if (lista == NULL) return;
